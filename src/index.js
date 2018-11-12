@@ -108,7 +108,8 @@ export default function commonjs(options = {}) {
 					}
 
 					const namedExports = customNamedExports[id];
-					const transformed = transformCommonjs(
+					return transformCommonjs.call(
+						this,
 						code,
 						ast,
 						id,
@@ -118,18 +119,19 @@ export default function commonjs(options = {}) {
 						namedExports,
 						sourceMap,
 						allowDynamicRequire
-					);
-					if (!transformed) {
-						if (namedExports && Object.keys(namedExports).length) {
-							throw new Error(
-								`Custom named exports were specified for ${id} but it does not appear to be a CommonJS module`
-							);
+					)
+					.then(transformed => {
+						if (!transformed) {
+							if (namedExports && Object.keys(namedExports).length) {
+								throw new Error(
+									`Custom named exports were specified for ${id} but it does not appear to be a CommonJS module`
+								);
+							}
+							esModulesWithoutDefaultExport[id] = true;
+							return null;
 						}
-						esModulesWithoutDefaultExport[id] = true;
-						return null;
-					}
-
-					return transformed;
+						return transformed;
+					});
 				})
 				.catch(err => {
 					this.error(err, err.loc);
