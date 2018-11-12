@@ -36,11 +36,6 @@ function tryParse(parse, code, id, module) {
 	}
 }
 
-export function hasCjsKeywords(code, ignoreGlobal) {
-	const firstpass = ignoreGlobal ? firstpassNoGlobal : firstpassGlobal;
-  return firstpass.test(code);
-}
-
 export function checkEsModule(parse, code, id) {
 	// first try parse as "script", falling back to "module"
 	try {
